@@ -63,7 +63,7 @@ export const JourneyPicker = ({ onJourneyChange }) => {
     fetchDates();
   }, []);
 
-  const handleSubmit = (event) => {
+  /*const handleSubmit = (event) => {
     event.preventDefault();
     const journeyData = {
       fromCity: fromCity,
@@ -73,7 +73,29 @@ export const JourneyPicker = ({ onJourneyChange }) => {
     console.log(
       `Uživatel chce objednt jízdenku z ${fromCity} do ${toCity} na ${data}.`,
     );
+  };*/
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!fromCity || !toCity || !date) {
+      return;
+    }
+    const apiURL = `https://apps.kodim.cz/daweb/leviexpress/api/journey?fromCity=${fromCity}&toCity=${toCity}&date=${date}`
+
+    try {
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('Nalezená spojení:', data);
+      // Volání onJourneyChange bude přidáno později
+    } catch (error) {
+      console.error('Chyba při vyhledávání spojení:', error);
+      // Zde by se mohlo implementovat uživatelské upozornění na chybu
+    }
   };
+  
 
 
 return (
@@ -109,7 +131,7 @@ return (
           </select>
         </label>
         <div className="journey-picker__controls">
-          <button className="btn" type="submit">
+          <button className="btn" type="submit" disabled={!fromCity || !toCity || !date}>
             Vyhledat spoj
           </button>
         </div>
